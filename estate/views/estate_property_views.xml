@@ -7,6 +7,7 @@
             <tree>
                 <field name="name" string="Title" />
                 <field name="property_type_id" />
+                <field name="tag_ids" widget="many2many_tags" />
                 <field name="postcode" />
                 <field name="bedrooms" />
                 <field name="living_area" string="Living Area (sqm)" />
@@ -24,8 +25,8 @@
             <form string="Property">
                 <sheet>
                     <group>
-                        <field name="name" style="font-size:24pt; margin-bottom: 16px;" />
-                        <newline />
+                        <field name="name" style="font-size:24pt;" />
+                        <field name="tag_ids" widget="many2many_tags" />
                         <group>
                             <field name="property_type_id" />
                             <field name="postcode" />
