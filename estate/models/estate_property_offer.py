@@ -1,4 +1,5 @@
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class PropertyOffer(models.Model):
@@ -28,3 +29,26 @@ class PropertyOffer(models.Model):
         for record in self:
             start_date = record.create_date if record.create_date else fields.Date.today()
             record.date_deadline = fields.Date.add(start_date, days=record.validity)
+
+    def action_accept_offer(self):
+        self.ensure_one()
+
+        if self.property_id.buyer_id:
+            raise UserError(_("There is an offer accepted already for this property."))
+
+        self.status = "accepted"
+        self.property_id.selling_price = self.price
+        self.property_id.buyer_id = self.partner_id
+        self.property_id.state = "offer_accepted"
+        return True
+
+    def action_refuse_offer(self):
+        self.ensure_one()
+
+        if self.property_id.offer_ids.filtered(lambda record: record.id == self.id and record.status == "accepted"):
+            self.property_id.selling_price = 0
+            self.property_id.buyer_id = False
+            self.property_id.state = "offer_received"
+
+        self.status = "refused"
+        return True
