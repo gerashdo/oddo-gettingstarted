@@ -6,6 +6,7 @@ from odoo.tools import float_compare
 class EstateProperty(models.Model):
     _name = "estate.property"
     _description = "Estate property model"
+    _order = "id desc"
 
     name = fields.Char(required=True)
     description = fields.Text()
