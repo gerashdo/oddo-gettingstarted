@@ -19,6 +19,10 @@ class PropertyOffer(models.Model):
     validity = fields.Integer(default=7, string="Validity (days)")
     date_deadline = fields.Date(compute="_compute_date_deadline", inverse="_inverse_validity", string="Deadline")
 
+    _sql_constraints = [
+        ("check_price", "CHECK(price > 0)", "The price must be strictly positive"),
+    ]
+
     def _inverse_validity(self):
         for record in self:
             end_date = fields.Date.to_date(record.create_date) if record.create_date else fields.Date.today()
