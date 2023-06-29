@@ -36,6 +36,17 @@ class PropertyOffer(models.Model):
             start_date = record.create_date if record.create_date else fields.Date.today()
             record.date_deadline = fields.Date.add(start_date, days=record.validity)
 
+    @api.model
+    def create(self, vals):
+        property_instance = self.env["estate.property"].browse(vals["property_id"])
+        if property_instance.offer_ids:
+            price_max_offer = max(offer.price for offer in property_instance.offer_ids)
+            if vals["price"] < price_max_offer:
+                raise UserError(_("The offer must be higher than %d", price_max_offer))
+
+        property_instance.state = "offer_received"
+        return super().create(vals)
+
     def action_accept_offer(self):
         self.ensure_one()
 
