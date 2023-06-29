@@ -6,6 +6,8 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name" string="Title" />
+                <field name="property_type_id" />
+                <field name="tag_ids" widget="many2many_tags" />
                 <field name="postcode" />
                 <field name="bedrooms" />
                 <field name="living_area" string="Living Area (sqm)" />
@@ -23,14 +25,16 @@
             <form string="Property">
                 <sheet>
                     <group>
-                        <field name="name" style="font-size:25pt; margin-bottom: 16px;" />
-                        <newline />
+                        <field name="name" style="font-size:24pt;" />
+                        <field name="tag_ids" widget="many2many_tags" />
                         <group>
+                            <field name="property_type_id" />
                             <field name="postcode" />
                             <field name="date_availability" string="Available From" />
                         </group>
                         <group>
                             <field name="expected_price" />
+                            <field name="best_price" />
                             <field name="selling_price" />
                         </group>
                     </group>
@@ -46,6 +50,18 @@
                                     <field name="garden" />
                                     <field name="garden_area" string="Garden Area (sqm)" />
                                     <field name="garden_orientation" />
+                                    <field name="total_area" />
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Offers">
+                            <field name="offer_ids" />
+                        </page>
+                        <page string="Other Info">
+                            <group>
+                                <group>
+                                    <field name="salesperson_id" />
+                                    <field name="buyer_id" />
                                 </group>
                             </group>
                         </page>
@@ -66,6 +82,7 @@
                 <field name="bedrooms" />
                 <field name="living_area" string="Living Area (sqm)" />
                 <field name="facades" />
+                <field name="property_type_id" />
                 <filter name="available" string="Available" domain="[('state','in',['new','offer_received'])]" />
                 <filter name="by_postcode" string="Postcode" context="{'group_by':'postcode'}" />
             </search>
