@@ -6,7 +6,7 @@
         "base",
     ],
     "data": [
-        "security/estate_security.xml",
+        "data/estate.property.type.csv",
         "security/ir.model.access.csv",
         "security/estate_security.xml",
         "views/estate_property_views.xml",
@@ -15,6 +15,9 @@
         "views/estate_property_tag_views.xml",
         "views/res_users_views.xml",
         "views/estate_menus.xml",
+    ],
+    "demo": [
+        "demo/estate_property.xml",
     ],
     "installable": True,
     "application": True,
