@@ -18,8 +18,6 @@ class EstateProperty(models.Model):
             "invoice_line_ids": invoice_line_vals,
         }
 
-        # self.env["account.move"].check_access_rights("write")
-        # print(" reached ".center(100, '='))
         self.env["account.move"].sudo().create([invoice_vals])
 
         return super().action_set_property_as_sold()
