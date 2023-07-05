@@ -39,6 +39,10 @@ class PropertyOffer(models.Model):
     @api.model
     def create(self, vals):
         property_instance = self.env["estate.property"].browse(vals["property_id"])
+
+        if property_instance.state == "sold":
+            raise UserError(_("The property is already sold."))
+
         if property_instance.offer_ids:
             price_max_offer = max(offer.price for offer in property_instance.offer_ids)
             if vals["price"] < price_max_offer:
