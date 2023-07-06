@@ -75,7 +75,7 @@ class EstateProperty(models.Model):
             self.garden_orientation = "north"
         else:
             self.garden_area = 0
-            self.garden_orientation = None
+            self.garden_orientation = False
 
     @api.constrains("expected_price", "selling_price")
     def _check_selling_price(self):
