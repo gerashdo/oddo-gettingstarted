@@ -1,9 +1,12 @@
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError, ValidationError
+from odoo.tools import float_compare
 
 
 class EstateProperty(models.Model):
     _name = "estate.property"
     _description = "Estate property model"
+    _order = "id desc"
 
     name = fields.Char(required=True)
     description = fields.Text()
@@ -39,6 +42,7 @@ class EstateProperty(models.Model):
         required=True,
         default="new",
         copy=False,
+        string="Status",
     )
     property_type_id = fields.Many2one("estate.property.type")
     buyer_id = fields.Many2one("res.partner", copy=False)
@@ -47,6 +51,11 @@ class EstateProperty(models.Model):
     offer_ids = fields.One2many("estate.property.offer", "property_id")
     total_area = fields.Integer(compute="_compute_total_area")
     best_price = fields.Float(compute="_compute_best_price")
+
+    _sql_constraints = [
+        ("check_expected_price", "CHECK(expected_price > 0)", "The expected price must be strictly positive."),
+        ("check_selling_price", "CHECK(selling_price >= 0)", "The selling price must be strictly positive."),
+    ]
 
     @api.depends("living_area", "garden_area")
     def _compute_total_area(self):
@@ -66,3 +75,30 @@ class EstateProperty(models.Model):
         else:
             self.garden_area = 0
             self.garden_orientation = None
+
+    @api.constrains("expected_price", "selling_price")
+    def _check_selling_price(self):
+        for record in self.filtered(lambda element: element.selling_price > 0):
+            if float_compare(record.selling_price, record.expected_price * 0.9, 2) < 0:
+                raise ValidationError(
+                    _(
+                        "The selling price must be at least 90% of the expected price. "
+                        "You must reduce the expected price if you want to accept this offer."
+                    )
+                )
+
+    def action_set_property_as_sold(self):
+        self.ensure_one()
+
+        if self.state == "canceled":
+            raise UserError(_("A canceled property can not be sold."))
+        self.state = "sold"
+        return True
+
+    def action_set_property_as_canceled(self):
+        self.ensure_one()
+
+        if self.state == "sold":
+            raise UserError(_("A sold property can not be canceled."))
+        self.state = "canceled"
+        return True
