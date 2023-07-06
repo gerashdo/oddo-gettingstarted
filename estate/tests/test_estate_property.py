@@ -1,6 +1,6 @@
 from odoo.exceptions import UserError
 from odoo.tests import tagged
-from odoo.tests.common import TransactionCase
+from odoo.tests.common import Form, TransactionCase
 
 
 @tagged("post_install", "-at_install")
@@ -50,3 +50,20 @@ class EstatePropertyTestCase(TransactionCase):
 
         with self.assertRaisesRegex(UserError, "There is no offer accepted."):
             self.property.action_set_property_as_sold()
+
+    def test_garden_on_change(self):
+        """When garden field is checked, garden_area should be 10 by default and garden_orientation
+        should be north by default. If is unchecked, should reset garden_area to 0 and
+        garden_orientation to False.
+        """
+
+        property_form = Form(self.env["estate.property"])
+        property_form.garden = True
+
+        self.assertEqual(property_form.garden_area, 10)
+        self.assertEqual(property_form.garden_orientation, "north")
+
+        property_form.garden = False
+
+        self.assertEqual(property_form.garden_area, 0)
+        self.assertEqual(property_form.garden_orientation, False)
