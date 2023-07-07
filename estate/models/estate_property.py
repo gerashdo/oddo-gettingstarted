@@ -87,6 +87,11 @@ class EstateProperty(models.Model):
                     )
                 )
 
+    @api.ondelete(at_uninstall=False)
+    def _unlik_if_new_or_canceled(self):
+        if any(property.state not in ["new", "canceled"] for property in self):
+            raise UserError(_("Only new or canceled properties can be deleted."))
+
     def action_set_property_as_sold(self):
         self.ensure_one()
 

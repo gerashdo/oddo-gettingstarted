@@ -19,6 +19,7 @@ class PropertyOffer(models.Model):
     property_id = fields.Many2one("estate.property", required=True)
     validity = fields.Integer(default=7, string="Validity (days)")
     date_deadline = fields.Date(compute="_compute_date_deadline", inverse="_inverse_validity", string="Deadline")
+    property_type_id = fields.Many2one(related="property_id.property_type_id", store=True)
 
     _sql_constraints = [
         ("check_price", "CHECK(price > 0)", "The price must be strictly positive"),
@@ -34,6 +35,17 @@ class PropertyOffer(models.Model):
         for record in self:
             start_date = record.create_date if record.create_date else fields.Date.today()
             record.date_deadline = fields.Date.add(start_date, days=record.validity)
+
+    @api.model
+    def create(self, vals):
+        property_instance = self.env["estate.property"].browse(vals["property_id"])
+        if property_instance.offer_ids:
+            price_max_offer = max(offer.price for offer in property_instance.offer_ids)
+            if vals["price"] < price_max_offer:
+                raise UserError(_("The offer must be higher than %d", price_max_offer))
+
+        property_instance.state = "offer_received"
+        return super().create(vals)
 
     def action_accept_offer(self):
         self.ensure_one()
