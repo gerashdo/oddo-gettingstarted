@@ -75,7 +75,7 @@ class EstateProperty(models.Model):
             self.garden_orientation = "north"
         else:
             self.garden_area = 0
-            self.garden_orientation = None
+            self.garden_orientation = False
 
     @api.constrains("expected_price", "selling_price")
     def _check_selling_price(self):
@@ -95,6 +95,9 @@ class EstateProperty(models.Model):
 
     def action_set_property_as_sold(self):
         self.ensure_one()
+
+        if not self.selling_price or self.state != "offer_accepted":
+            raise UserError(_("There is no offer accepted."))
 
         if self.state == "canceled":
             raise UserError(_("A canceled property can not be sold."))
