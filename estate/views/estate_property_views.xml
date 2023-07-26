@@ -141,7 +141,7 @@
         <field name="name">estate.property.search</field>
         <field name="model">estate.property</field>
         <field name="arch" type="xml">
-            <search string="Propery">
+            <search string="Property">
                 <field name="name" string="Title" />
                 <field name="postcode" />
                 <field name="expected_price" />

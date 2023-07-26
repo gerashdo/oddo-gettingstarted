@@ -5,7 +5,9 @@
         "estate",
         "account",
     ],
-    "data": [],
+    "data": [
+        "report/estate_property_templates.xml",
+    ],
     "application": True,
     "installable": True,
     "license": "LGPL-3",
